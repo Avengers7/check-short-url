@@ -32,13 +32,13 @@ def identify_short_link_from_url(url):
     if url_tld not in final_url:
         # 认为URL的TLD长度大于9则可能不属于短链接，进行下一步判断
         if len(url_tld) <= 9:
-            with open('short_link_list.txt', 'a') as list:
+            with open('../short_link_list.txt', 'a') as list:
                 list.write(url+'\n')
             # short_link_list.append(url)
             return True
         # 在URL的TLD长度大于9的情况下，且其TLD不在真实访问链接中，则根据响应码判断其是否属于短链
         elif response_code == 302:
-            with open('short_link_list.txt', 'a') as list:
+            with open('../short_link_list.txt', 'a') as list:
                 list.write(url+'\n')
             # short_link_list.append(url)
             return True
