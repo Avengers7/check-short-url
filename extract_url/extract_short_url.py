@@ -1,5 +1,6 @@
 import json
 import re
+import string
 
 import iocextract
 from tldextract import tldextract
@@ -55,9 +56,44 @@ def extract_all_url(content_raw):
     # 经过iocextract提取后的URL列表
     url_list_after_ioc = iocextract.extract_urls(content_raw)
 
-    # TODO 需要进一步降低误报
+    # 初始化list
+    iocex_url = []
+    list_dot = []
+    list_more_dot = []
+    list_sub_symbol = []
+    list_last = []
+    url_list_final = []
 
-    return url_list_after_ioc
+    for url in url_list_after_ioc:
+        iocex_url.append(url)
+
+    # 检测URL中点号是否>=3个
+    for url in iocex_url:
+        count = url.count('.')
+        if count < 3:
+            list_dot.append(url)
+        else:
+            list_more_dot.append(url)
+    print('符合条件的url：', list_dot)
+    print('不符合条件的url: ', list_more_dot)
+
+    # 去除特殊字符
+    for url in list_more_dot:
+        url = re.sub('[’!"\'()*+,;-<=>?，。?★、…【】《》？“”‘’！[\\]^_`{|}~\s]+', "", url)
+        url = re.sub(r'(\\n)', "", url)
+        list_sub_symbol.append(url)
+    print('去除特殊字符后: ', list_sub_symbol)
+
+    # 类型转换
+    list_sub_symbol = "\n".join(list_sub_symbol)
+
+    # 再次提取
+    list_final = iocextract.extract_urls(list_sub_symbol)
+    for url in list_final:
+        list_last.append(url)
+    print('再次iocextract提取：', list_last)
+
+    return url_list_final
 
 
 def extract_url_by_regexp(content_raw):
@@ -113,4 +149,3 @@ if __name__ == '__main__':
     # """
     # url_list = extract_url_by_regexp(content_raw=content_raw)
     # print(url_list)
-
