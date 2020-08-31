@@ -125,6 +125,11 @@ def local_identify_short_url(content_raw):
     # 更新总共的短链的URL:TLD字典
     short_url_to_tld_dict.update(url_to_tld_after_length_check)
 
+    # 经过检查URL的TLD是否在域名白名单中
+    url_to_tld_after_domain_white_list_check = identify_short_url_by_white_domain_list(url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_after_domain_white_list_check)
+
     return short_url_to_tld_dict
 
 
@@ -182,7 +187,7 @@ def identify_short_url_by_length(url_to_tld_dict):
     """
     检查URL信长度是否符合短链的长度特征
     :param url_to_tld_dict: 从文本内容中提取的URL:TLD字典
-    :return:
+    :return: 经过URL长度检查后的URL:TLD字典
     """
     # 可能属于短链的URL:TLD的字典
     short_url_to_tld_dict = {}
@@ -207,6 +212,25 @@ def identify_short_url_by_length(url_to_tld_dict):
     for url in url_to_tld_dict.keys():
         if url_length_dict[url] and tld_length_dict[url]:
             short_url_to_tld_dict[url] = url_to_tld_dict[url]
+
+    return short_url_to_tld_dict
+
+
+def identify_short_url_by_white_domain_list(url_to_tld_dict):
+    """
+    检查URL的TLD是否在域名白名单中
+    :param url_list: 从文本内容中提取的URL:TLD字典
+    :return: 经过TLD白名单检查后的URL:TLD字典
+    """
+    # 可能属于短链的URL:TLD的字典
+    short_url_to_tld_dict = {}
+
+    top_domain_list = loads_file.loads_file_from_txt_to_list(fpath="../data/top_domain_cn.txt")
+    for url in url_to_tld_dict.keys():
+        tld = url_to_tld_dict[url]
+        for top_domain in top_domain_list:
+            if not(tld == top_domain):
+                short_url_to_tld_dict[url] = tld
 
     return short_url_to_tld_dict
 
@@ -251,8 +275,8 @@ if __name__ == '__main__':
     """
     测试：检查URL是否来自短链服务，通过对比TLD
     """
-    if_from_shoturl_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
-    print("本地检测URL是否有来自短链服务提供商的：{0}".format(if_from_shoturl_service))
+    if_from_short_url_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
+    print("本地检测URL是否有来自短链服务提供商的：{0}".format(if_from_short_url_service))
 
     """
     测试：检查URL的后缀是否为常见的短链后缀
@@ -265,3 +289,9 @@ if __name__ == '__main__':
     """
     if_short_url_length = identify_short_url_by_length(url_to_tld_dict=url_to_tld_dict)
     print("检查URL信长度是否符合短链的长度特征：{0}".format(if_short_url_length))
+
+    """
+    测试：检查URL的TLD是否在域名白名单中
+    """
+    if_tld_in_domain_white_list = identify_short_url_by_white_domain_list(url_to_tld_dict=url_to_tld_dict)
+    print("检查URL的TLD是否在域名白名单中：{0}".format(if_tld_in_domain_white_list))
