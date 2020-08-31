@@ -109,10 +109,21 @@ def local_identify_short_url(content_raw):
     # 初始化属于短链的URL:TLD的字典
     short_url_to_tld_dict = {}
 
+
     # 经过短链服务检查后的URL:TLD字典
     url_to_tld_dict_after_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
     # 更新总共的短链的URL:TLD字典
     short_url_to_tld_dict.update(url_to_tld_dict_after_service)
+
+    # 经过常见的短链后缀检查后的URL:TLD字典
+    url_to_tld_dict_after_suffix_check = identify_short_url_by_suffix(url_to_tld_dict=url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_dict_after_suffix_check)
+
+    # 经过URL长度是否符合短链长度特征后的URL:TLD字典
+    url_to_tld_after_length_check = identify_short_url_by_length(url_to_tld_dict=url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_after_length_check)
 
     return short_url_to_tld_dict
 
@@ -142,7 +153,7 @@ def identify_short_url_by_suffix(url_to_tld_dict):
     :param url_to_tld_dict: 从文本内容中提取的URL:TLD字典
     :return: 经过后缀检查后的URL:TLD字典
     """
-    # 可能属于短链的URL:它的TLD的字典
+    # 可能属于短链的URL:TLD的字典
     short_url_to_tld_dict = {}
     short_url_service_domain_list = loads_file_from_txt_to_list(fpath="../data/short_url_services_list.txt")
     # 常见短链服务提供商的域名后缀集合
@@ -151,7 +162,7 @@ def identify_short_url_by_suffix(url_to_tld_dict):
         suffix = tldextract.extract(url)[2]
         suffix_set.add(suffix)
     # 通用域名，不列为可疑的短链域名后缀
-    common_suffix_list = ['com','net','info','org','']
+    common_suffix_list = ['com', 'net', 'info', 'org', '']
     for common_suffix in common_suffix_list:
         suffix_set.remove(common_suffix)
 
@@ -159,9 +170,44 @@ def identify_short_url_by_suffix(url_to_tld_dict):
 
     for url in url_to_tld_dict.keys():
         input_url_suffix = tldextract.extract(url_to_tld_dict[url])[2]
+        # 传入URL的TLD
+        tld = url_to_tld_dict[url]
         for suffix in suffix_set:
             if input_url_suffix == suffix:
-                short_url_to_tld_dict[url] = input_url_suffix
+                short_url_to_tld_dict[url] = tld
+    return short_url_to_tld_dict
+
+
+def identify_short_url_by_length(url_to_tld_dict):
+    """
+    检查URL信长度是否符合短链的长度特征
+    :param url_to_tld_dict: 从文本内容中提取的URL:TLD字典
+    :return:
+    """
+    # 可能属于短链的URL:TLD的字典
+    short_url_to_tld_dict = {}
+
+    # 关于 URL:URL长度 的字典
+    url_length_dict = {}
+    # 关于 URL:TLD长度 的字典
+    tld_length_dict = {}
+    for url in url_to_tld_dict.keys():
+        tld = url_to_tld_dict[url]
+        if len(tld) > 10:
+            tld_length_dict[url] = False
+        else:
+            tld_length_dict[url] = True
+
+    for url in url_to_tld_dict.keys():
+        if len(url) >= 35:
+            url_length_dict[url] = False
+        else:
+            url_length_dict[url] = True
+
+    for url in url_to_tld_dict.keys():
+        if url_length_dict[url] and tld_length_dict[url]:
+            short_url_to_tld_dict[url] = url_to_tld_dict[url]
+
     return short_url_to_tld_dict
 
 
@@ -197,6 +243,12 @@ if __name__ == '__main__':
     # print("检测的链接是否为短链接：{0}".format(if_short_url_list))
 
     """
+    测试：本地（离线）识别URL是否属于短链
+    """
+    short_url_to_tld_dict = local_identify_short_url(content_raw=content_raw)
+    print("=======属于短链的原始URL:TLD的字典：{0}=======".format(short_url_to_tld_dict))
+
+    """
     测试：检查URL是否来自短链服务，通过对比TLD
     """
     if_from_shoturl_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
@@ -207,3 +259,9 @@ if __name__ == '__main__':
     """
     if_short_url_suffix = identify_short_url_by_suffix(url_to_tld_dict=url_to_tld_dict)
     print("检查URL的后缀是否为常见的短链后缀：{0}".format(if_short_url_suffix))
+
+    """
+    测试：检查URL信息的长度进行判别
+    """
+    if_short_url_length = identify_short_url_by_length(url_to_tld_dict=url_to_tld_dict)
+    print("检查URL信长度是否符合短链的长度特征：{0}".format(if_short_url_length))
