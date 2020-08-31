@@ -35,6 +35,24 @@ def loads_file_to_object(fpath):
         return None
 
 
+def loads_file_from_txt_to_list(fpath):
+    """
+    读取txt格式的文件，并将内容存储为list对象返回
+    :param fpath: 文件路径
+    :return:文件内容逐行读取后存入的list
+    """
+    content_list = []
+    try:
+        with open(fpath, "r", encoding="utf-8") as fp:
+            lines = fp.readlines()
+            for line in lines:
+                content_list.append(line.strip())
+            return content_list
+    except:
+        traceback.format_exc()
+        return None
+
+
 if __name__ == '__main__':
     file_path = "../data/short_url_service.txt"
     print(loads_file_to_content_raw(fpath=file_path))

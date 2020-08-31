@@ -6,22 +6,58 @@ from tldextract import tldextract
 from utils import loads_file
 
 
+def extract_all_url_test(content_raw):
+    """
+    提取文本中全部的URL
+    :param content_raw: 传入进行提取全部URL的文本
+    :return: 文本中全部URL的列表
+    """
+
+    # 经过iocextract提取后的URL列表
+    url_list_after_ioc = iocextract.extract_urls(content_raw)
+    """
+    iocextract提取测试
+    """
+    url_number_after_ioc = len(list(url_list_after_ioc))
+    url_list_after_ioc_test = []
+    for url in url_list_after_ioc:
+        url_list_after_ioc_test.append(url)
+    # print("经过ioc提取后的URL列表：{0}".format(url_list_after_ioc_test))
+    # print("经过ioc提取后的URL列表：{0}".format(list(url_list_after_ioc)))
+    print("经过ioc提取后的URL链接数量为：{0}".format(url_number_after_ioc))
+
+    # 经过正则表达式提取后的URL列表
+    url_list_after_regexp = extract_url_by_regexp(content_raw)
+    """
+    正则表达式提取测试
+    """
+    url_number_after_regexp = len(url_list_after_regexp)
+    url_list_after_regexp_show = []
+    for url in url_list_after_regexp:
+        url_list_after_regexp_show.append(url)
+    print("经过正则表达式提取后的URL列表：{0}：".format(url_list_after_regexp_show))
+    print("经过正则表达式提取后的URL链接数量为：{0}".format(url_number_after_regexp))
+
+    url_list_final = []
+
+    # TODO 需要进一步降低误报
+
+    return url_list_after_ioc
+
+
 def extract_all_url(content_raw):
     """
     提取文本中全部的URL
     :param content_raw: 传入进行提取全部URL的文本
     :return: 文本中全部URL的列表
     """
+
     # 经过iocextract提取后的URL列表
     url_list_after_ioc = iocextract.extract_urls(content_raw)
-    # 经过正则表达式提取后的URL列表
-    url_list_after_regexp = extract_url_by_regexp(content_raw)
-
-    url_list_final = []
 
     # TODO 需要进一步降低误报
 
-    return url_list_final
+    return url_list_after_ioc
 
 
 def extract_url_by_regexp(content_raw):
@@ -38,19 +74,21 @@ def extract_tld(content_raw):
     """
     提取文本中全部URL的TLD
     :param content_raw: 传入进行提取TLD的文本
-    :return: 文本中所包含链接的全部TLD列表
+    :return: 文本中所包含链接:TLD的字典，示例数据：{'https://zeek.ir/': 'zeek.ir'}
     """
     url_list = extract_all_url(content_raw)
     tld_list = []
+    short_url_dict = {}
     for url in url_list:
         if url:
             tld_array = tldextract.extract(url)
             tld_element = tld_array[1] + "." + tld_array[2]
             tld_list.append(tld_element)
+            short_url_dict[url] = tld_element
         else:
             continue
 
-    return tld_list
+    return short_url_dict
 
 
 if __name__ == '__main__':
@@ -62,17 +100,17 @@ if __name__ == '__main__':
     # """
     # tld_list = extract_tld(content_raw)
     # print(tld_list)
-    #
-    #
-    # """
-    # 测试：提取文本中的全部URL
-    # """
-    # print(extract_all_url(content_raw))
 
 
     """
-    测试：从文本中根据正则表达式
+    测试：提取文本中的全部URL
     """
-    url_list = extract_url_by_regexp(content_raw=content_raw)
-    print(url_list)
+    extract_all_url(content_raw)
+
+
+    # """
+    # 测试：从文本中根据正则表达式
+    # """
+    # url_list = extract_url_by_regexp(content_raw=content_raw)
+    # print(url_list)
 

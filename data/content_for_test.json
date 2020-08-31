@@ -7,6 +7,10 @@
 	"specific_hyperlink": "<a href=http://www.phishing.com>http://www.normal_web.com</a>`",
 	"https_url_example": "https://google.com",
 	"normal_hyperlink": "<a href=http://www.normal_web.com>normal_web.com</a>`",
+	"short_url_service": [
+		"https://zeek.ir/huhsdfods",
+		"https://virl.com/jdfiehoifn"
+	],
 	"_index": "skyeye-mail-2019.12.02",
 	"_type": "skyeye-mail",
 	"_id": "AW7FTtqhS636aec5Lko0",
