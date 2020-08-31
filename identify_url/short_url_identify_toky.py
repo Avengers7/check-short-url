@@ -103,17 +103,65 @@ def local_identify_short_url(content_raw):
     :return: 属于短链的原始URL:TLD的字典，示例数据：{'https://zeek.ir/huhsdfods': 'zeek.ir'}
     """
 
+    # 从文本内容中提取的URL:TLD字典
+    url_to_tld_dict = extract_tld(content_raw=content_raw)
+
+    # 初始化属于短链的URL:TLD的字典
+    short_url_to_tld_dict = {}
+
+    # 经过短链服务检查后的URL:TLD字典
+    url_to_tld_dict_after_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_dict_after_service)
+
+    return short_url_to_tld_dict
+
+
+def identify_short_url_by_service(url_to_tld_dict):
+    """
+    检查URL是否来自短链服务，通过对比TLD
+    :param url_to_tld_dict: 从文本内容中提取的URL:TLD字典
+    :return: 经过短链服务检查后的URL:TLD字典
+    """
+
     # 属于短链的URL:它的TLD的字典
     short_url_to_tld_dict = {}
-    url_to_tld_dict = extract_tld(content_raw=content_raw)
-    shor_url_service_domain_list = loads_file_from_txt_to_list(fpath="../data/short_url_services_list.txt")
+    short_url_service_domain_list = loads_file_from_txt_to_list(fpath="../data/short_url_services_list.txt")
     for url in url_to_tld_dict.keys():
-        for service_domain in shor_url_service_domain_list:
+        for service_domain in short_url_service_domain_list:
             # 传入URL的TLD
             tld = url_to_tld_dict[url]
             if tld == service_domain:
                 short_url_to_tld_dict[url] = tld
+    return short_url_to_tld_dict
 
+
+def identify_short_url_by_suffix(url_to_tld_dict):
+    """
+    检查URL的后缀是否为常见的短链后缀
+    :param url_to_tld_dict: 从文本内容中提取的URL:TLD字典
+    :return: 经过后缀检查后的URL:TLD字典
+    """
+    # 可能属于短链的URL:它的TLD的字典
+    short_url_to_tld_dict = {}
+    short_url_service_domain_list = loads_file_from_txt_to_list(fpath="../data/short_url_services_list.txt")
+    # 常见短链服务提供商的域名后缀集合
+    suffix_set = set()
+    for url in short_url_service_domain_list:
+        suffix = tldextract.extract(url)[2]
+        suffix_set.add(suffix)
+    # 通用域名，不列为可疑的短链域名后缀
+    common_suffix_list = ['com','net','info','org','']
+    for common_suffix in common_suffix_list:
+        suffix_set.remove(common_suffix)
+
+    # print("短链服务提供商的常见域名后缀的集合：{0}".format(suffix_set))
+
+    for url in url_to_tld_dict.keys():
+        input_url_suffix = tldextract.extract(url_to_tld_dict[url])[2]
+        for suffix in suffix_set:
+            if input_url_suffix == suffix:
+                short_url_to_tld_dict[url] = input_url_suffix
     return short_url_to_tld_dict
 
 
@@ -128,6 +176,8 @@ if __name__ == '__main__':
     content_obj = loads_file.loads_file_to_object(fpath=file_path)
     # 字符串形式的邮件文本数据
     content_raw = loads_file.loads_file_to_content_raw(fpath=file_path)
+    # 从文本内容中提取的URL:TLD字典
+    url_to_tld_dict = extract_tld(content_raw=content_raw)
 
     # """
     # 测试：从文本中提取全部的短链接
@@ -147,7 +197,13 @@ if __name__ == '__main__':
     # print("检测的链接是否为短链接：{0}".format(if_short_url_list))
 
     """
-    测试：本地检测URL是否来自短链服务提供商
+    测试：检查URL是否来自短链服务，通过对比TLD
     """
-    if_from_shoturl_service = local_identify_short_url(content_raw=content_raw)
+    if_from_shoturl_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
     print("本地检测URL是否有来自短链服务提供商的：{0}".format(if_from_shoturl_service))
+
+    """
+    测试：检查URL的后缀是否为常见的短链后缀
+    """
+    if_short_url_suffix = identify_short_url_by_suffix(url_to_tld_dict=url_to_tld_dict)
+    print("检查URL的后缀是否为常见的短链后缀：{0}".format(if_short_url_suffix))
