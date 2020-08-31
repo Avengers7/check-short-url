@@ -1,6 +1,16 @@
 import urllib.request
 import tldextract
 import argparse
+import re
+import iocextract
+
+
+# 创建一个解析对象
+parser = argparse.ArgumentParser(description='check short url')
+# 向该对象中添加你要关注的命令行参数和选项，每一个add_argument方法对应一个你要关注的参数或选项
+parser.add_argument('--url', '-u', help='url you want to identify')
+# 调用parse_args()方法进行解析，解析成功之后即可使用
+args = parser.parse_args()
 
 
 def identify_short_link_from_url(url):
@@ -32,13 +42,13 @@ def identify_short_link_from_url(url):
     if url_tld not in final_url:
         # 认为URL的TLD长度大于9则可能不属于短链接，进行下一步判断
         if len(url_tld) <= 9:
-            with open('../short_link_list.txt', 'a') as list:
+            with open('short_link_list.txt', 'a') as list:
                 list.write(url+'\n')
             # short_link_list.append(url)
             return True
         # 在URL的TLD长度大于9的情况下，且其TLD不在真实访问链接中，则根据响应码判断其是否属于短链
         elif response_code == 302:
-            with open('../short_link_list.txt', 'a') as list:
+            with open('short_link_list.txt', 'a') as list:
                 list.write(url+'\n')
             # short_link_list.append(url)
             return True
@@ -46,19 +56,21 @@ def identify_short_link_from_url(url):
         return False
 
 
-def add_help():
-    """
-    # argparse用于解析命令行参数
-    :return:
-    """
-    # 创建一个解析对象
-    parser = argparse.ArgumentParser(description='check short url')
-    # 向该对象中添加你要关注的命令行参数和选项，每一个add_argument方法对应一个你要关注的参数或选项
-    parser.add_argument('--url', '-u', help='url you want to identify')
-    # 调用parse_args()方法进行解析，解析成功之后即可使用
-    args = parser.parse_args()
+def identify_short_link_from_text(file):
+    url_list = []
+    with open(file, 'r') as file:
+        # readlines()：一次读取所有内容并按行返回列表
+        lines = file.readlines()
+        for url in iocextract.extract_urls(lines):
+            url_list.append(url)
+        for line in url_list:
+            urls = re.findall('http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', line)
+            with open('short_link_list.txt', 'a') as list:
+                list.write(urls+'\n')
+
+    with open('short_link_list.txt', 'r') as list:
+        identify_short_link_from_url(urls)
 
 
 if __name__ == '__main__':
-    # add_help()
-    identify_short_link_from_url('http://suo.im/5TUxCn')
+    identify_short_link_from_text('short_link_text.txt')
