@@ -111,7 +111,6 @@ def identify_short_link_from_url_local(url):
 if __name__ == '__main__':
     # example_url = "http://34.64.205.36:9421/"
     # port = extract_port(url=example_url)
-    #
     # print(type(port))
 
     # 测试用邮件数据的路径
@@ -124,8 +123,8 @@ if __name__ == '__main__':
     """
     测试：从文本中提取全部的短链接
     """
-    # short_link_list = extract_short_link(content_raw=content_raw)
-    # print(short_link_list)
+    short_link_list = extract_short_link(content_raw=content_raw)
+    print(short_link_list)
 
     """
     测试：判断短链接
