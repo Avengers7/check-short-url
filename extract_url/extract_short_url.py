@@ -106,13 +106,29 @@ def extract_url_by_regexp(content_raw):
     return url_list
 
 
+def extract_all_url_simple(content_raw):
+    """
+    提取文本中全部的URL（仅使用iocextract）
+    :param content_raw: 传入进行提取全部URL的文本
+    :return: 文本中全部URL的列表
+    """
+
+    # 经过iocextract提取后的URL列表
+    url_list_after_ioc = iocextract.extract_urls(content_raw)
+
+    return url_list_after_ioc
+
+
 def extract_tld(content_raw):
     """
     提取文本中全部URL的TLD
     :param content_raw: 传入进行提取TLD的文本
     :return: 文本中所包含链接:TLD的字典，示例数据：{'https://zeek.ir/': 'zeek.ir'}
     """
-    url_list = extract_all_url(content_raw)
+    # url_list = extract_all_url(content_raw)
+    # 测试使用
+    url_list = extract_all_url_simple(content_raw)
+
     tld_list = []
     short_url_dict = {}
     for url in url_list:
