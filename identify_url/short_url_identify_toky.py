@@ -22,55 +22,6 @@ from utils import loads_file
 from utils.loads_file import loads_file_from_txt_to_list
 
 
-def local_identify_short_url(content_raw):
-    """
-    本地（离线）识别URL是否属于短链
-    :param content_raw: 需要检验的字符串文本内容
-    :return: 属于短链的原始URL:TLD的字典，示例数据：{'https://zeek.ir/huhsdfods': 'zeek.ir'}
-    """
-
-    # 从文本内容中提取的URL:TLD字典
-    url_to_tld_dict = extract_tld(content_raw=content_raw)
-
-    # 初始化属于短链的URL:TLD的字典
-    short_url_to_tld_dict = {}
-
-
-    # 经过短链服务检查后的URL:TLD字典
-    url_to_tld_dict_after_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
-    # 更新总共的短链的URL:TLD字典
-    short_url_to_tld_dict.update(url_to_tld_dict_after_service)
-
-    # 经过常见的短链后缀检查后的URL:TLD字典
-    url_to_tld_dict_after_suffix_check = identify_short_url_by_suffix(url_to_tld_dict=url_to_tld_dict)
-    # 更新总共的短链的URL:TLD字典
-    short_url_to_tld_dict.update(url_to_tld_dict_after_suffix_check)
-
-    # 经过URL长度是否符合短链长度特征后的URL:TLD字典
-    url_to_tld_after_length_check = identify_short_url_by_length(url_to_tld_dict=url_to_tld_dict)
-    # 更新总共的短链的URL:TLD字典
-    short_url_to_tld_dict.update(url_to_tld_after_length_check)
-
-    # 经过检查URL的TLD是否在域名白名单中
-    url_to_tld_after_domain_white_list_check = identify_short_url_by_white_domain_list(url_to_tld_dict)
-    # 更新总共的短链的URL:TLD字典
-    short_url_to_tld_dict.update(url_to_tld_after_domain_white_list_check)
-
-    # 将可信度较低的筛选结果求交集
-    part_one_short_url_list = list(url_to_tld_dict_after_suffix_check.keys() & url_to_tld_after_length_check.keys() &
-                                   url_to_tld_after_domain_white_list_check.keys())
-    # 短链服务TLD检查的可信度较高
-    part_two_short_url_list = list(url_to_tld_dict_after_service.keys())
-
-    # 将可信度较低结果的交集与高可信结果做并集，得到最终确定的短链URL列表
-    final_short_url_list = part_one_short_url_list + part_two_short_url_list
-
-    # 将最终确定的短链URL转化为集合（set），去重
-    final_short_url_set = set(final_short_url_list)
-
-    return final_short_url_set
-
-
 def identify_short_url_by_service(url_to_tld_dict):
     """
     检查URL是否来自短链服务，通过对比TLD
@@ -171,3 +122,55 @@ def identify_short_url_by_white_domain_list(url_to_tld_dict):
                 short_url_to_tld_dict[url] = tld
 
     return short_url_to_tld_dict
+
+
+def local_identify_short_url(content_raw):
+    """
+    本地（离线）识别URL是否属于短链
+    :param content_raw: 需要检验的字符串文本内容
+    :return: 属于短链的原始URL:TLD的字典，示例数据：{'https://zeek.ir/huhsdfods': 'zeek.ir'}
+    """
+
+    # 从文本内容中提取的URL:TLD字典
+    url_to_tld_dict = extract_tld(content_raw=content_raw)
+
+    # 初始化属于短链的URL:TLD的字典
+    short_url_to_tld_dict = {}
+
+
+    # 经过短链服务检查后的URL:TLD字典
+    url_to_tld_dict_after_service = identify_short_url_by_service(url_to_tld_dict=url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_dict_after_service)
+
+    # 经过常见的短链后缀检查后的URL:TLD字典
+    url_to_tld_dict_after_suffix_check = identify_short_url_by_suffix(url_to_tld_dict=url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_dict_after_suffix_check)
+
+    # 经过URL长度是否符合短链长度特征后的URL:TLD字典
+    url_to_tld_after_length_check = identify_short_url_by_length(url_to_tld_dict=url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_after_length_check)
+
+    # 经过检查URL的TLD是否在域名白名单中
+    url_to_tld_after_domain_white_list_check = identify_short_url_by_white_domain_list(url_to_tld_dict)
+    # 更新总共的短链的URL:TLD字典
+    short_url_to_tld_dict.update(url_to_tld_after_domain_white_list_check)
+
+    # 将可信度较低的筛选结果求交集
+    part_one_short_url_list = list(url_to_tld_dict_after_suffix_check.keys() &
+                                   url_to_tld_after_domain_white_list_check.keys())
+    # 将可行度较高的筛选结果求交集
+    part_two_short_url_list = list(url_to_tld_dict_after_service.keys() & url_to_tld_after_length_check.keys())
+
+    # 将可信度较低结果的交集与高可信结果做并集，得到最终确定的短链URL列表
+    # final_short_url_list = part_one_short_url_list + part_two_short_url_list
+
+    final_short_url_list = list(url_to_tld_dict_after_suffix_check.keys() & url_to_tld_after_domain_white_list_check.keys()\
+                           & url_to_tld_dict_after_service.keys() & url_to_tld_after_length_check.keys())
+
+    # 将最终确定的短链URL转化为集合（set），去重
+    final_short_url_set = set(final_short_url_list)
+
+    return final_short_url_set

@@ -14,7 +14,8 @@ from utils import loads_file
 
 if __name__ == '__main__':
     # 测试用数据的路径
-    file_path = "../data/content_for_test.json"
+    # file_path = "../data/content_for_test.json"
+    file_path = "../data/random_data_one.json"
     # 对象化测试用的文件数据
     content_obj = loads_file.loads_file_to_object(fpath=file_path)
     # 字符串形式的文件数据
