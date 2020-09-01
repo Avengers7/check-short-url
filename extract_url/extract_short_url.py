@@ -5,6 +5,10 @@ import string
 import iocextract
 from tldextract import tldextract
 from utils import loads_file
+from bs4 import BeautifulSoup
+
+
+url_list_short = []
 
 
 def extract_all_url_test(content_raw):
@@ -54,46 +58,14 @@ def extract_all_url(content_raw):
     """
 
     # 经过iocextract提取后的URL列表
-    url_list_after_ioc = iocextract.extract_urls(content_raw)
+    url_list_after_ioc = extract_all_url_simple(content_raw=content_raw)
 
-    # 初始化list
-    iocex_url = []
-    list_dot = []
-    list_more_dot = []
-    list_sub_symbol = []
-    list_last = []
-    url_list_final = []
+    # 经过dots判断的URL列表
+    url_list_after_dots = judge_by_dots(url_list_after_ioc=url_list_after_ioc)
 
-    for url in url_list_after_ioc:
-        iocex_url.append(url)
-
-    # 检测URL中点号是否>=3个
-    for url in iocex_url:
-        count = url.count('.')
-        if count < 3:
-            list_dot.append(url)
-        else:
-            list_more_dot.append(url)
-    print('符合条件的url：', list_dot)
-    print('不符合条件的url: ', list_more_dot)
-
-    # 去除特殊字符
-    for url in list_more_dot:
-        url = re.sub('[’!"\'()*+,;-<=>?，。?★、…【】《》？“”‘’！[\\]^_`{|}~\s]+', "", url)
-        url = re.sub(r'(\\n)', "", url)
-        list_sub_symbol.append(url)
-    print('去除特殊字符后: ', list_sub_symbol)
-
-    # 类型转换
-    list_sub_symbol = "\n".join(list_sub_symbol)
-
-    # 再次提取
-    list_final = iocextract.extract_urls(list_sub_symbol)
-    for url in list_final:
-        list_last.append(url)
-    print('再次iocextract提取：', list_last)
-
-    return url_list_final
+    # 经过beautifulsoup去除标签的URL列表
+    url_list_after_beautifulsoup = remove_html_tags(list_more_dots=url_list_after_dots)
+    print("url_list_after_beautifulsoup", url_list_after_beautifulsoup)
 
 
 def extract_url_by_regexp(content_raw):
@@ -117,6 +89,60 @@ def extract_all_url_simple(content_raw):
     url_list_after_ioc = iocextract.extract_urls(content_raw)
 
     return url_list_after_ioc
+
+
+def judge_by_dots(url_list_after_ioc):
+    """
+    通过点号数量判单是否为短链（短链<3）
+    :param url_ioc: url_list_after_ioc
+    :return: url_list_after_dots
+    """
+
+    iocextract_url = []
+    list_more_dots = []
+    for url in url_list_after_ioc:
+        iocextract_url.append(url)
+
+    # dots判断
+    for url in iocextract_url:
+        count = url.count('.')
+        if count < 3:
+            url_list_short.append(url)
+        else:
+            list_more_dots.append(url)
+
+    return list_more_dots
+
+
+def remove_html_tags(list_more_dots):
+    """
+    使用beautifulsoup去除标签
+    :param list_more_dots: 经过dots判断的长链
+    :return: 去除标签后的URL列表
+    """
+
+    list_dots = []
+    list_soup = []
+    for url in list_more_dots:
+        list_dots.append(url)
+
+    list_dots = "\n".join(list_dots)
+
+    # beautifulsoup去除标签
+    soup = BeautifulSoup(list_dots, features="html.parser")
+    # 移除标签
+    valid_tags = ['a']
+    for tag in soup.find_all(True):
+        if tag.name in valid_tags:
+            tag.extract()
+
+    soup = "\n".join(soup)
+
+    # 再次iocextract提取
+    soup = iocextract.extract_urls(soup)
+    for url in soup:
+        list_soup.append(url)
+    return list_soup
 
 
 def extract_tld(content_raw):
