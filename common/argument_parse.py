@@ -26,6 +26,8 @@ class ArgumentParse(object):
         self.relative_path = ""
         self.absolute_path = ""
         self.result_dict = {}
+        if self.args.file is None:
+            exit()
 
     def get_file_path(self):
         """
