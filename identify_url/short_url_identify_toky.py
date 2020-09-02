@@ -34,7 +34,7 @@ class IdentifyShortUrl(object):
         """
         判断字典
         字典结构：{URL:是否属于短链服务提供商, URL总体长度是否过长, URL的TLD是否够短, TLD白名单检查, 常见域名后缀检查}
-        示例数据：'https://zeek.ir/huhsdfods': [True, False, True, True, False], 'https://virl.com/jdfiehoifn': [True, False, True, False, False]}
+        示例数据：{'https://zeek.ir/huhsdfods': [True, False, True, True, False], 'https://virl.com/jdfiehoifn': [True, False, True, False, False]}
         """
         self.judge_dict = {}
 
