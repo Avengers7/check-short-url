@@ -1,5 +1,5 @@
 """
-本模块用于本地（离线）识别URL是否属于短链
+模块：用于提取、识别URL是否属于短链
 （初版）主要有以下四个判断因素：
 - 检查URL是否来自短链服务，通过对比TLD
 - 检查URL的总体长度是否过长
@@ -7,7 +7,6 @@
 - 检查URL的TLD是否在域名白名单中
 - 检查URL的后缀是否为常见的短链后缀
 """
-import copy
 import os
 import sys
 
@@ -16,6 +15,7 @@ rootPath = os.path.split(curPath)[0]
 # 引入根目录，让程序在执行的单个文件时能找到根目录
 sys.path.append(rootPath)
 
+import copy
 import tldextract.tldextract
 from utils import loads_file
 from utils.loads_file import loads_file_from_txt_to_list
@@ -227,15 +227,3 @@ class IdentifyShortUrl(object):
                     short_url_to_tld_dict[url] = tld
 
         return short_url_to_tld_dict
-
-
-if __name__ == '__main__':
-    # 需要检验的数据文件路径
-    file_path = "../data/random_data_one.json"
-    # 初始化类的对象
-    identifyShortUrl_obj = IdentifyShortUrl()
-    # 传入需要检验的数据文件路径
-    identifyShortUrl_obj.init_content(file_path=file_path)
-    # 经过多种检验后，提取出的短链URL:TLD字典
-    short_url_to_tld_dict = identifyShortUrl_obj.local_identify_short_url()
-    print("【最终结果】属于短链的原始URL:TLD的字典：{0}".format(short_url_to_tld_dict))
