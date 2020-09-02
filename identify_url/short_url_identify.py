@@ -17,10 +17,9 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 import tldextract.tldextract
-
-from extract_url.extract_short_url import extract_tld
 from utils import loads_file
 from utils.loads_file import loads_file_from_txt_to_list
+from extract_url.extract_short_url import ExtractUrl
 
 
 class IdentifyShortUrl(object):
@@ -48,8 +47,10 @@ class IdentifyShortUrl(object):
         self.content_obj = copy.deepcopy(loads_file.loads_file_to_object(fpath=file_path))
         # 字符串形式的文件数据
         self.content_raw = copy.deepcopy(loads_file.loads_file_to_content_raw(fpath=file_path))
-        # 从文本内容中提取的URL:TLD字典
-        self.url_to_tld_dict = extract_tld(content_raw=self.content_raw)
+        # 初始化URL提取类
+        url_extract_obj = ExtractUrl()
+        # 提取文本数据中的所有URL，得到URL:TLD字典
+        self.url_to_tld_dict = url_extract_obj.extract_tld(content_raw=self.content_raw)
         # 初始化判断字典
         for url in self.url_to_tld_dict.keys():
             self.judge_dict[url] = []
@@ -63,7 +64,11 @@ class IdentifyShortUrl(object):
 
         # 属于短链的URL:它的TLD的字典
         short_url_to_tld_dict = {}
-        short_url_service_domain_list = loads_file_from_txt_to_list(fpath="../data/short_url_services_list.txt")
+        # 项目根目录的路径
+        rootPath = os.path.split(curPath)[0]
+        # 短链服务提供商域名列表的绝对路径
+        url_service_list_path = rootPath + "/data/short_url_services_list.txt"
+        short_url_service_domain_list = loads_file_from_txt_to_list(fpath=url_service_list_path)
         for url in self.url_to_tld_dict.keys():
             flag = False
             for service_domain in short_url_service_domain_list:
@@ -86,7 +91,11 @@ class IdentifyShortUrl(object):
         """
         # 可能属于短链的URL:TLD的字典
         short_url_to_tld_dict = {}
-        short_url_service_domain_list = loads_file_from_txt_to_list(fpath="../data/short_url_services_list.txt")
+        # 项目根目录的路径
+        rootPath = os.path.split(curPath)[0]
+        # 短链服务提供商域名列表的绝对路径，由此来获取常用的短链后缀
+        short_url_service_domain_list_path_absolute = rootPath + "/data/short_url_services_list.txt"
+        short_url_service_domain_list = loads_file_from_txt_to_list(fpath=short_url_service_domain_list_path_absolute)
         # 常见短链服务提供商的域名后缀集合
         suffix_set = set()
         for url in short_url_service_domain_list:
@@ -163,8 +172,11 @@ class IdentifyShortUrl(object):
         """
         # 可能属于短链的URL:TLD的字典
         short_url_to_tld_dict = {}
-
-        top_domain_list = loads_file.loads_file_from_txt_to_list(fpath="../data/top_domain_cn.txt")
+        # 项目根目录的路径
+        rootPath = os.path.split(curPath)[0]
+        # Top域名列表的绝对路径
+        top_domain_list_path_absolute = rootPath + "/data/top_domain_cn.txt"
+        top_domain_list = loads_file.loads_file_from_txt_to_list(fpath=top_domain_list_path_absolute)
         for url in self.url_to_tld_dict.keys():
             flag = False
             tld = self.url_to_tld_dict[url]
@@ -185,10 +197,6 @@ class IdentifyShortUrl(object):
         :param content_raw: 需要检验的字符串文本内容
         :return: 属于短链的原始URL:TLD的字典，示例数据：{'https://zeek.ir/huhsdfods': 'zeek.ir'}
         """
-
-        # 从文本内容中提取的URL:TLD字典
-        url_to_tld_dict = extract_tld(content_raw=self.content_raw)
-
         # 初始化属于短链的URL:TLD的字典
         short_url_to_tld_dict = {}
 

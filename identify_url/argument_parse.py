@@ -1,3 +1,11 @@
+import os
+import sys
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+# 引入根目录，让程序在执行的单个文件时能找到根目录
+sys.path.append(rootPath)
+
 import argparse
 from utils import loads_file
 

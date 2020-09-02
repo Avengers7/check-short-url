@@ -50,6 +50,7 @@ def loads_file_from_txt_to_list(fpath):
             return content_list
     except:
         traceback.format_exc()
+        print("文件输入异常，请检查你的文件路径")
         return None
 
 

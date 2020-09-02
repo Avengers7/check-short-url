@@ -1,12 +1,17 @@
-import json
+import os
+import sys
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+# 引入根目录，让程序在执行的单个文件时能找到根目录
+sys.path.append(rootPath)
+
 import re
-import string
 
 import iocextract
 from tldextract import tldextract
 from utils import loads_file
 from bs4 import BeautifulSoup
-from identify_url import argument_parse
 
 
 class ExtractUrl(object):
@@ -153,6 +158,29 @@ class ExtractUrl(object):
         """
         # url_list = extract_all_url(content_raw)
         # 测试使用
+        url_list = self.extract_all_url(content_raw)
+
+        tld_list = []
+        short_url_dict = {}
+        for url in url_list:
+            if url:
+                tld_array = tldextract.extract(url)
+                tld_element = tld_array[1] + "." + tld_array[2]
+                tld_list.append(tld_element)
+                short_url_dict[url] = tld_element
+            else:
+                continue
+
+        return short_url_dict
+
+    def extract_tld_simple(self, content_raw):
+        """
+        使用iocextract提取文本中全部URL的TLD
+        :param content_raw: 传入进行提取TLD的文本
+        :return: 文本中所包含链接:TLD的字典，示例数据：{'https://zeek.ir/': 'zeek.ir'}
+        """
+        # url_list = extract_all_url(content_raw)
+        # 测试使用
         url_list = self.extract_all_url_simple(content_raw)
 
         tld_list = []
@@ -179,13 +207,15 @@ if __name__ == '__main__':
     # tld_list = extract_tld(content_raw)
     # print(tld_list)
 
-
     """
     测试：提取文本中的全部URL
     """
-    extract = ExtractUrl()
-    list = extract.extract_all_url(content_raw=content_raw)
-    print(list)
+    url_extract_obj = ExtractUrl()
+    url_list = url_extract_obj.extract_all_url(content_raw=content_raw)
+    tld_list = url_extract_obj.extract_tld(content_raw=content_raw)
+    tld_list_simple = url_extract_obj.extract_tld_simple(content_raw=content_raw)
+    print("降噪前提取的URL个数：{0}".format(len(tld_list_simple)))
+    print("降噪后提取的URL个数：{0}".format(len(tld_list)))
 
     # """
     # 测试：从文本中根据正则表达式
