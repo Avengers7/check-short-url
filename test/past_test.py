@@ -38,3 +38,55 @@
 #             short_link_list.append(url)
 #             return True
 #     return False
+
+
+# def local_identify_short_url(self):
+#     """
+#     本地（离线）识别URL是否属于短链
+#     :param content_raw: 需要检验的字符串文本内容
+#     :return: 属于短链的原始URL:TLD的字典，示例数据：{'https://zeek.ir/huhsdfods': 'zeek.ir'}
+#     """
+#
+#     # 从文本内容中提取的URL:TLD字典
+#     url_to_tld_dict = extract_tld(content_raw=self.content_raw)
+#
+#     # 初始化属于短链的URL:TLD的字典
+#     short_url_to_tld_dict = {}
+#
+#
+#     # 经过短链服务检查后的URL:TLD字典
+#     url_to_tld_dict_after_service = self.identify_short_url_by_service()
+#     # 更新总共的短链的URL:TLD字典
+#     short_url_to_tld_dict.update(url_to_tld_dict_after_service)
+#
+#     # 经过常见的短链后缀检查后的URL:TLD字典
+#     url_to_tld_dict_after_suffix_check = self.identify_short_url_by_suffix()
+#     # 更新总共的短链的URL:TLD字典
+#     short_url_to_tld_dict.update(url_to_tld_dict_after_suffix_check)
+#
+#     # 经过URL长度是否符合短链长度特征后的URL:TLD字典
+#     url_to_tld_after_length_check = self.identify_short_url_by_length()
+#     # 更新总共的短链的URL:TLD字典
+#     short_url_to_tld_dict.update(url_to_tld_after_length_check)
+#
+#     # 经过检查URL的TLD是否在域名白名单中
+#     url_to_tld_after_domain_white_list_check = self.identify_short_url_by_white_domain_list()
+#     # 更新总共的短链的URL:TLD字典
+#     short_url_to_tld_dict.update(url_to_tld_after_domain_white_list_check)
+#
+#     # 将可信度较低的筛选结果求交集
+#     part_one_short_url_list = list(url_to_tld_dict_after_suffix_check.keys() &
+#                                    url_to_tld_after_domain_white_list_check.keys())
+#     # 将可行度较高的筛选结果求交集
+#     part_two_short_url_list = list(url_to_tld_dict_after_service.keys() & url_to_tld_after_length_check.keys())
+#
+#     # 将可信度较低结果的交集与高可信结果做并集，得到最终确定的短链URL列表
+#     # final_short_url_list = part_one_short_url_list + part_two_short_url_list
+#
+#     final_short_url_list = list(url_to_tld_dict_after_suffix_check.keys() & url_to_tld_after_domain_white_list_check.keys()\
+#                            & url_to_tld_dict_after_service.keys() & url_to_tld_after_length_check.keys())
+#
+#     # 将最终确定的短链URL转化为集合（set），去重
+#     final_short_url_set = set(final_short_url_list)
+#
+#     return final_short_url_set

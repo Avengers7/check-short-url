@@ -54,3 +54,7 @@ if __name__ == '__main__':
     """
     if_tld_in_domain_white_list = identify_short_url_by_white_domain_list(url_to_tld_dict=url_to_tld_dict)
     print("检查URL的TLD是否在域名白名单中：{0}".format(if_tld_in_domain_white_list))
+
+    """
+    {是否属于短链服务提供商, URL总体长度是否过长, URL的TLD是否够短, TLD白名单检查, 常见域名后缀检查}
+    """
