@@ -19,43 +19,43 @@ class ExtractUrl(object):
     def __init__(self):
         pass
 
-    def extract_all_url_test(self, content_raw):
-        """
-        提取文本中全部的URL
-        :param content_raw: 传入进行提取全部URL的文本
-        :return: 文本中全部URL的列表
-        """
-
-        # 经过iocextract提取后的URL列表
-        url_list_after_ioc = iocextract.extract_urls(content_raw)
-        """
-        iocextract提取测试
-        """
-        url_number_after_ioc = len(list(url_list_after_ioc))
-        url_list_after_ioc_test = []
-        for url in url_list_after_ioc:
-            url_list_after_ioc_test.append(url)
-        # print("经过ioc提取后的URL列表：{0}".format(url_list_after_ioc_test))
-        # print("经过ioc提取后的URL列表：{0}".format(list(url_list_after_ioc)))
-        print("经过ioc提取后的URL链接数量为：{0}".format(url_number_after_ioc))
-
-        # 经过正则表达式提取后的URL列表
-        url_list_after_regexp = self.extract_url_by_regexp()
-        """
-        正则表达式提取测试
-        """
-        url_number_after_regexp = len(url_list_after_regexp)
-        url_list_after_regexp_show = []
-        for url in url_list_after_regexp:
-            url_list_after_regexp_show.append(url)
-        print("经过正则表达式提取后的URL列表：{0}：".format(url_list_after_regexp_show))
-        print("经过正则表达式提取后的URL链接数量为：{0}".format(url_number_after_regexp))
-
-        url_list_final = []
-
-        # TODO 需要进一步降低误报
-
-        return url_list_after_ioc
+    # def extract_all_url_test(self, content_raw):
+    #     """
+    #     提取文本中全部的URL
+    #     :param content_raw: 传入进行提取全部URL的文本
+    #     :return: 文本中全部URL的列表
+    #     """
+    #
+    #     # 经过iocextract提取后的URL列表
+    #     url_list_after_ioc = iocextract.extract_urls(content_raw)
+    #     """
+    #     iocextract提取测试
+    #     """
+    #     url_number_after_ioc = len(list(url_list_after_ioc))
+    #     url_list_after_ioc_test = []
+    #     for url in url_list_after_ioc:
+    #         url_list_after_ioc_test.append(url)
+    #     # print("经过ioc提取后的URL列表：{0}".format(url_list_after_ioc_test))
+    #     # print("经过ioc提取后的URL列表：{0}".format(list(url_list_after_ioc)))
+    #     print("经过ioc提取后的URL链接数量为：{0}".format(url_number_after_ioc))
+    #
+    #     # 经过正则表达式提取后的URL列表
+    #     url_list_after_regexp = self.extract_url_by_regexp()
+    #     """
+    #     正则表达式提取测试
+    #     """
+    #     url_number_after_regexp = len(url_list_after_regexp)
+    #     url_list_after_regexp_show = []
+    #     for url in url_list_after_regexp:
+    #         url_list_after_regexp_show.append(url)
+    #     print("经过正则表达式提取后的URL列表：{0}：".format(url_list_after_regexp_show))
+    #     print("经过正则表达式提取后的URL链接数量为：{0}".format(url_number_after_regexp))
+    #
+    #     url_list_final = []
+    #
+    #     # TODO 需要进一步降低误报
+    #
+    #     return url_list_after_ioc
 
     def extract_url_by_regexp(self, content_raw):
         """
@@ -181,7 +181,6 @@ if __name__ == '__main__':
     # """
     # tld_list = extract_tld(content_raw)
     # print(tld_list)
-
 
     """
     测试：提取文本中的全部URL

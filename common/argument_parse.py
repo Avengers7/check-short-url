@@ -1,7 +1,6 @@
 import os
 import sys
 
-from identify_url import short_url_identify
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -10,6 +9,7 @@ sys.path.append(rootPath)
 
 import argparse
 import copy
+from identify_url import short_url_identify
 
 
 class ArgumentParse(object):
